@@ -5593,6 +5593,14 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
+        if (file.type === MIME_TYPES.csv) {
+          const fileReader = new FileReader();
+          console.log(file);
+          fileReader.readAsText(file, "Shift_JIS");
+          console.log(fileReader);
+          return;
+        }
+
         // if no scene is embedded or we fail for whatever reason, fall back
         // to importing as regular image
         // ---------------------------------------------------------------------
