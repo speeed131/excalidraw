@@ -5596,8 +5596,34 @@ class App extends React.Component<AppProps, AppState> {
         if (file.type === MIME_TYPES.csv) {
           const fileReader = new FileReader();
           console.log(file);
+          // fileReader.readAsDataURL(file);
           fileReader.readAsText(file, "Shift_JIS");
-          console.log(fileReader);
+          fileReader.onload = () => {
+            // ファイル読み込み
+            // eslint-disable-next-line valid-typeof
+            if (typeof fileReader.result == "string") {
+              const result = fileReader?.result.split("\r\n") ?? null;
+              console.log(result);
+
+              const header = result[0].split(",");
+              console.log(header);
+
+              const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+                event,
+                this.state,
+              );
+
+              const imageElement = this.createImageElement({ sceneX, sceneY });
+              console.log(imageElement);
+              this.insertImageElement(imageElement, file);
+              this.initializeImageDimensions(imageElement);
+              this.setState({
+                selectedElementIds: { [imageElement.id]: true },
+              });
+            }
+
+            // console.log(fileResult);
+          };
           return;
         }
 
