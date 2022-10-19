@@ -102,6 +102,7 @@ import {
   newLinearElement,
   newTextElement,
   newImageElement,
+  newTableElement,
   textWysiwyg,
   transformElements,
   updateTextElement,
@@ -3945,6 +3946,33 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
+  private createTableElement = ({
+    sceneX,
+    sceneY,
+  }: {
+    sceneX: number;
+    sceneY: number;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const element = newTableElement({
+      type: "image",
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      locked: false,
+    });
+
+    return element;
+  };
+
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     elementType: ExcalidrawLinearElement["type"],
@@ -5608,104 +5636,128 @@ class App extends React.Component<AppProps, AppState> {
               const header = result[0].split(",");
               console.log(header);
 
-              const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-                event,
-                this.state,
-              );
-
-              const insertAtParentCenter = true;
-              const parentCenterPosition =
-                insertAtParentCenter &&
-                this.getTextWysiwygSnappedToCenterPosition(
-                  sceneX,
-                  sceneY,
-                  this.state,
-                  this.canvas,
-                  window.devicePixelRatio,
-                );
-
-              let existingTextElement: NonDeleted<ExcalidrawTextElement> | null =
-                null;
-              const container: ExcalidrawTextContainer | null = null;
-
-              const selectedElements = getSelectedElements(
-                this.scene.getNonDeletedElements(),
-                this.state,
-              );
-
-              if (selectedElements.length === 1) {
-                if (isTextElement(selectedElements[0])) {
-                  existingTextElement = selectedElements[0];
-                } else if (
-                  isTextBindableContainer(selectedElements[0], false)
-                ) {
-                  existingTextElement = getBoundTextElement(
-                    selectedElements[0],
-                  );
-                } else {
-                  existingTextElement = this.getTextElementAtPosition(
-                    sceneX,
-                    sceneY,
-                  );
-                }
-              } else {
-                existingTextElement = this.getTextElementAtPosition(
-                  sceneX,
-                  sceneY,
-                );
+              interface Props {
+                data: any[];
+                columns: any[];
               }
-
-              const element = newTextElement({
-                x: parentCenterPosition
-                  ? parentCenterPosition.elementCenterX
-                  : sceneX,
-                y: parentCenterPosition
-                  ? parentCenterPosition.elementCenterY
-                  : sceneY,
-                strokeColor: this.state.currentItemStrokeColor,
-                backgroundColor: this.state.currentItemBackgroundColor,
-                fillStyle: this.state.currentItemFillStyle,
-                strokeWidth: this.state.currentItemStrokeWidth,
-                strokeStyle: this.state.currentItemStrokeStyle,
-                roughness: this.state.currentItemRoughness,
-                opacity: this.state.currentItemOpacity,
-                strokeSharpness: this.state.currentItemStrokeSharpness,
-                text: header.join(" "),
-                fontSize: this.state.currentItemFontSize,
-                fontFamily: this.state.currentItemFontFamily,
-                textAlign: parentCenterPosition
-                  ? "center"
-                  : this.state.currentItemTextAlign,
-                verticalAlign: parentCenterPosition
-                  ? VERTICAL_ALIGN.MIDDLE
-                  : DEFAULT_VERTICAL_ALIGN,
-                containerId: undefined,
-                groupIds: [],
-                locked: false,
-              });
-              this.scene.replaceAllElements([
-                ...this.scene.getElementsIncludingDeleted(),
-                element,
-              ]);
-              this.setState({ selectedElementIds: { [element.id]: true } });
-
-              console.log(element);
+              const Table = () => {
+                return (
+                  // <?xml version="1.0" standalone="yes"?>
+                  <svg xmlns="http://www.w3.org/2000/svg">
+                    <foreignObject x="10" y="10" width="100" height="150">
+                      {/* <body xmlns="http://www.w3.org/1999/xhtml"> */}
+                      <table>
+                        <thead>
+                          {header.map((item, index) => (
+                            <tr key={index}>
+                              <th>{item}</th>
+                            </tr>
+                          ))}
+                        </thead>
+                      </table>
+                      {/* </body> */}
+                    </foreignObject>
+                  </svg>
+                );
+              };
 
               // const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
               //   event,
               //   this.state,
               // );
 
-              // const imageElement = this.createImageElement({ sceneX, sceneY });
-              // console.log(imageElement);
-              // this.insertImageElement(imageElement, file);
-              // this.initializeImageDimensions(imageElement);
-              // this.setState({
-              //   selectedElementIds: { [imageElement.id]: true },
-              // });
-            }
+              // const insertAtParentCenter = true;
+              // const parentCenterPosition =
+              //   insertAtParentCenter &&
+              //   this.getTextWysiwygSnappedToCenterPosition(
+              //     sceneX,
+              //     sceneY,
+              //     this.state,
+              //     this.canvas,
+              //     window.devicePixelRatio,
+              //   );
 
-            // console.log(fileResult);
+              // let existingTextElement: NonDeleted<ExcalidrawTextElement> | null =
+              //   null;
+              // const container: ExcalidrawTextContainer | null = null;
+
+              // const selectedElements = getSelectedElements(
+              //   this.scene.getNonDeletedElements(),
+              //   this.state,
+              // );
+
+              // if (selectedElements.length === 1) {
+              //   if (isTextElement(selectedElements[0])) {
+              //     existingTextElement = selectedElements[0];
+              //   } else if (
+              //     isTextBindableContainer(selectedElements[0], false)
+              //   ) {
+              //     existingTextElement = getBoundTextElement(
+              //       selectedElements[0],
+              //     );
+              //   } else {
+              //     existingTextElement = this.getTextElementAtPosition(
+              //       sceneX,
+              //       sceneY,
+              //     );
+              //   }
+              // } else {
+              //   existingTextElement = this.getTextElementAtPosition(
+              //     sceneX,
+              //     sceneY,
+              //   );
+              // }
+
+              // const element = newTextElement({
+              //   x: parentCenterPosition
+              //     ? parentCenterPosition.elementCenterX
+              //     : sceneX,
+              //   y: parentCenterPosition
+              //     ? parentCenterPosition.elementCenterY
+              //     : sceneY,
+              //   strokeColor: this.state.currentItemStrokeColor,
+              //   backgroundColor: this.state.currentItemBackgroundColor,
+              //   fillStyle: this.state.currentItemFillStyle,
+              //   strokeWidth: this.state.currentItemStrokeWidth,
+              //   strokeStyle: this.state.currentItemStrokeStyle,
+              //   roughness: this.state.currentItemRoughness,
+              //   opacity: this.state.currentItemOpacity,
+              //   strokeSharpness: this.state.currentItemStrokeSharpness,
+              //   text: header.join(" "),
+              //   fontSize: this.state.currentItemFontSize,
+              //   fontFamily: this.state.currentItemFontFamily,
+              //   textAlign: parentCenterPosition
+              //     ? "center"
+              //     : this.state.currentItemTextAlign,
+              //   verticalAlign: parentCenterPosition
+              //     ? VERTICAL_ALIGN.MIDDLE
+              //     : DEFAULT_VERTICAL_ALIGN,
+              //   containerId: undefined,
+              //   groupIds: [],
+              //   locked: false,
+              // });
+              // this.scene.replaceAllElements([
+              //   ...this.scene.getElementsIncludingDeleted(),
+              //   element,
+              // ]);
+              // this.setState({ selectedElementIds: { [element.id]: true } });
+
+              // console.log(element);
+
+              const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+                event,
+                this.state,
+              );
+              console.log(Table);
+              const imageElement = this.createTableElement({ sceneX, sceneY });
+              this.insertImageElement(imageElement, Table);
+
+              // console.log(imageElement);
+              this.initializeImageDimensions(imageElement);
+              this.setState({
+                selectedElementIds: { [imageElement.id]: true },
+              });
+            }
           };
           return;
         }

@@ -343,6 +343,25 @@ export const newImageElement = (
   };
 };
 
+export const newTableElement = (
+  opts: {
+    type: ExcalidrawImageElement["type"];
+    status?: ExcalidrawImageElement["status"];
+    fileId?: ExcalidrawImageElement["fileId"];
+    scale?: ExcalidrawImageElement["scale"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawImageElement> => {
+  return {
+    ..._newElementBase<ExcalidrawImageElement>("image", opts),
+    // in the future we'll support changing stroke color for some SVG elements,
+    // and `transparent` will likely mean "use original colors of the image"
+    strokeColor: "transparent",
+    status: opts.status ?? "pending",
+    fileId: opts.fileId ?? null,
+    scale: opts.scale ?? [1, 1],
+  };
+};
+
 // Simplified deep clone for the purpose of cloning ExcalidrawElement only
 // (doesn't clone Date, RegExp, Map, Set, Typed arrays etc.)
 //
