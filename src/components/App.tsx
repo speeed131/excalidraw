@@ -5613,13 +5613,96 @@ class App extends React.Component<AppProps, AppState> {
                 this.state,
               );
 
-              const imageElement = this.createImageElement({ sceneX, sceneY });
-              console.log(imageElement);
-              this.insertImageElement(imageElement, file);
-              this.initializeImageDimensions(imageElement);
-              this.setState({
-                selectedElementIds: { [imageElement.id]: true },
+              const insertAtParentCenter = true;
+              const parentCenterPosition =
+                insertAtParentCenter &&
+                this.getTextWysiwygSnappedToCenterPosition(
+                  sceneX,
+                  sceneY,
+                  this.state,
+                  this.canvas,
+                  window.devicePixelRatio,
+                );
+
+              let existingTextElement: NonDeleted<ExcalidrawTextElement> | null =
+                null;
+              const container: ExcalidrawTextContainer | null = null;
+
+              const selectedElements = getSelectedElements(
+                this.scene.getNonDeletedElements(),
+                this.state,
+              );
+
+              if (selectedElements.length === 1) {
+                if (isTextElement(selectedElements[0])) {
+                  existingTextElement = selectedElements[0];
+                } else if (
+                  isTextBindableContainer(selectedElements[0], false)
+                ) {
+                  existingTextElement = getBoundTextElement(
+                    selectedElements[0],
+                  );
+                } else {
+                  existingTextElement = this.getTextElementAtPosition(
+                    sceneX,
+                    sceneY,
+                  );
+                }
+              } else {
+                existingTextElement = this.getTextElementAtPosition(
+                  sceneX,
+                  sceneY,
+                );
+              }
+
+              const element = newTextElement({
+                x: parentCenterPosition
+                  ? parentCenterPosition.elementCenterX
+                  : sceneX,
+                y: parentCenterPosition
+                  ? parentCenterPosition.elementCenterY
+                  : sceneY,
+                strokeColor: this.state.currentItemStrokeColor,
+                backgroundColor: this.state.currentItemBackgroundColor,
+                fillStyle: this.state.currentItemFillStyle,
+                strokeWidth: this.state.currentItemStrokeWidth,
+                strokeStyle: this.state.currentItemStrokeStyle,
+                roughness: this.state.currentItemRoughness,
+                opacity: this.state.currentItemOpacity,
+                strokeSharpness: this.state.currentItemStrokeSharpness,
+                text: header.join(" "),
+                fontSize: this.state.currentItemFontSize,
+                fontFamily: this.state.currentItemFontFamily,
+                textAlign: parentCenterPosition
+                  ? "center"
+                  : this.state.currentItemTextAlign,
+                verticalAlign: parentCenterPosition
+                  ? VERTICAL_ALIGN.MIDDLE
+                  : DEFAULT_VERTICAL_ALIGN,
+                containerId: undefined,
+                groupIds: [],
+                locked: false,
               });
+              this.scene.replaceAllElements([
+                ...this.scene.getElementsIncludingDeleted(),
+                element,
+              ]);
+              this.setState({ selectedElementIds: { [element.id]: true } });
+
+              console.log(element);
+
+              // const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+              //   event,
+              //   this.state,
+              // );
+
+              // const imageElement = this.createImageElement({ sceneX, sceneY });
+              // console.log(imageElement);
+              // this.insertImageElement(imageElement, file);
+              // this.initializeImageDimensions(imageElement);
+              // this.setState({
+              //   selectedElementIds: { [imageElement.id]: true },
+              // });
             }
 
             // console.log(fileResult);
