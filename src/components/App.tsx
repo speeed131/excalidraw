@@ -5,6 +5,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
+import testImg from "../assets/logo-180x180.png";
 
 import {
   actionAddToLibrary,
@@ -5567,15 +5568,51 @@ class App extends React.Component<AppProps, AppState> {
       if (isSupportedImageFile(file)) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
+        const testImgParsedToBlob = await (await fetch(testImg)).blob();
+        const testImgParsed = new File([testImgParsedToBlob], "copy filename", {
+          type: "image/png",
+        });
+        console.log(file);
+        console.log(testImgParsedToBlob);
+        console.log(testImgParsed);
+        // console.log(testImgParsed);
+        if (file.type === MIME_TYPES.csv) {
+          try {
+            const scene = await loadFromBlob(
+              testImgParsed,
+              this.state,
+              this.scene.getElementsIncludingDeleted(),
+              fileHandle,
+            );
+
+            this.syncActionResult({
+              ...scene,
+              appState: {
+                ...(scene.appState || this.state),
+                isLoading: false,
+              },
+              replaceFiles: true,
+              commitToHistory: true,
+            });
+            return;
+          } catch (error: any) {
+            if (error.name !== "EncodingError") {
+              throw error;
+            }
+          }
+        }
 
         if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
           try {
+            //@TODO: ここのロードとは？
             const scene = await loadFromBlob(
               file,
               this.state,
               this.scene.getElementsIncludingDeleted(),
               fileHandle,
             );
+
+            //＠TODO: これが何をやっているのか
             this.syncActionResult({
               ...scene,
               appState: {
@@ -5603,6 +5640,13 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         const imageElement = this.createImageElement({ sceneX, sceneY });
+        // if (file.type === MIME_TYPES.csv)
+        console.log(testImg);
+
+        // this.insertImageElement(
+        //   imageElement,
+        //   file.type === MIME_TYPES.csv ? testImg : file,
+        // );
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
         this.setState({ selectedElementIds: { [imageElement.id]: true } });

@@ -114,13 +114,17 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
+  //@Watch: localData
   const localDataState = importFromLocalStorage();
 
+  //@Watch: localData
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
   } = await loadScene(null, null, localDataState);
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
+
+  //@Watch: localData
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
@@ -300,6 +304,7 @@ const ExcalidrawWrapper = () => {
       return;
     }
 
+    //@Watch: localData
     const loadImages = (
       data: ResolutionType<typeof initializeScene>,
       isInitialLoad = false,
@@ -401,6 +406,7 @@ const ExcalidrawWrapper = () => {
       TITLE_TIMEOUT,
     );
 
+    //@Watch: localData
     const syncData = debounce(() => {
       if (isTestEnv()) {
         return;
@@ -439,6 +445,7 @@ const ExcalidrawWrapper = () => {
               return acc;
             }, [] as FileId[]) || [];
           if (fileIds.length) {
+            //@Watch: localData
             LocalData.fileStorage
               .getFiles(fileIds)
               .then(({ loadedFiles, erroredFiles }) => {
@@ -456,10 +463,12 @@ const ExcalidrawWrapper = () => {
       }
     }, SYNC_BROWSER_TABS_TIMEOUT);
 
+    //@Watch: localData
     const onUnload = () => {
       LocalData.flushSave();
     };
 
+    //@Watch: localData
     const visibilityChange = (event: FocusEvent | Event) => {
       if (event.type === EVENT.BLUR || document.hidden) {
         LocalData.flushSave();
@@ -493,8 +502,10 @@ const ExcalidrawWrapper = () => {
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
+      //@Watch: localData
       LocalData.flushSave();
 
+      //@Watch: localData
       if (
         excalidrawAPI &&
         LocalData.fileStorage.shouldPreventUnload(
@@ -543,6 +554,7 @@ const ExcalidrawWrapper = () => {
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
+      //@Watch: localData
       LocalData.save(elements, appState, files, () => {
         if (excalidrawAPI) {
           let didChange = false;
@@ -551,6 +563,7 @@ const ExcalidrawWrapper = () => {
             .getSceneElementsIncludingDeleted()
             .map((element) => {
               if (
+                //なぜエレメントなのか
                 LocalData.fileStorage.shouldUpdateImageElementStatus(element)
               ) {
                 const newElement = newElementWith(element, { status: "saved" });
