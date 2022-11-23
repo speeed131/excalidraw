@@ -502,10 +502,8 @@ const ExcalidrawWrapper = () => {
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
-      //@Watch: localData
       LocalData.flushSave();
 
-      //@Watch: localData
       if (
         excalidrawAPI &&
         LocalData.fileStorage.shouldPreventUnload(
@@ -554,7 +552,7 @@ const ExcalidrawWrapper = () => {
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
-      //@Watch: localData
+      //@NOTE: localDataのSaveがonChangeで走っている
       LocalData.save(elements, appState, files, () => {
         if (excalidrawAPI) {
           let didChange = false;
@@ -563,7 +561,7 @@ const ExcalidrawWrapper = () => {
             .getSceneElementsIncludingDeleted()
             .map((element) => {
               if (
-                //なぜエレメントなのか
+                //@NOTE: なぜエレメントなのか?
                 LocalData.fileStorage.shouldUpdateImageElementStatus(element)
               ) {
                 const newElement = newElementWith(element, { status: "saved" });

@@ -5126,9 +5126,12 @@ class App extends React.Component<AppProps, AppState> {
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
       try {
-        imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-        });
+        //@NOTE:なぜかここで引っかかる
+        if (false) {
+          imageFile = await resizeImageFile(imageFile, {
+            maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+          });
+        }
       } catch (error: any) {
         console.error("error trying to resing image file on insertion", error);
       }
@@ -5568,18 +5571,19 @@ class App extends React.Component<AppProps, AppState> {
       if (isSupportedImageFile(file)) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
-        const testImgParsedToBlob = await (await fetch(testImg)).blob();
-        const testImgParsed = new File([testImgParsedToBlob], "copy filename", {
-          type: "image/png",
-        });
+
+        // const testImgParsedToBlob = await (await fetch(testImg)).blob();
+        // const testImgParsed = new File([testImgParsedToBlob], "copy filename", {
+        //   type: "image/svg+xml",
+        // });
         console.log(file);
-        console.log(testImgParsedToBlob);
-        console.log(testImgParsed);
+        // console.log(testImgParsedToBlob);
+        // console.log(testImgParsed);
         // console.log(testImgParsed);
         if (file.type === MIME_TYPES.csv) {
           try {
             const scene = await loadFromBlob(
-              testImgParsed,
+              file,
               this.state,
               this.scene.getElementsIncludingDeleted(),
               fileHandle,
@@ -5641,7 +5645,6 @@ class App extends React.Component<AppProps, AppState> {
 
         const imageElement = this.createImageElement({ sceneX, sceneY });
         // if (file.type === MIME_TYPES.csv)
-        console.log(testImg);
 
         // this.insertImageElement(
         //   imageElement,
