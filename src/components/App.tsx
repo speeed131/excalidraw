@@ -5622,6 +5622,22 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (file.type === MIME_TYPES.csv) {
+          const scene = await loadFromBlob(
+            file,
+            this.state,
+            this.scene.getElementsIncludingDeleted(),
+            fileHandle,
+          );
+          this.syncActionResult({
+            ...scene,
+            appState: {
+              ...(scene.appState || this.state),
+              isLoading: false,
+            },
+            replaceFiles: true,
+            commitToHistory: true,
+          });
+
           const fileReader = new FileReader();
           console.log(file);
           // fileReader.readAsDataURL(file);
@@ -5636,30 +5652,30 @@ class App extends React.Component<AppProps, AppState> {
               const header = result[0].split(",");
               console.log(header);
 
-              interface Props {
-                data: any[];
-                columns: any[];
-              }
-              const Table = () => {
-                return (
-                  // <?xml version="1.0" standalone="yes"?>
-                  <svg xmlns="http://www.w3.org/2000/svg">
-                    <foreignObject x="10" y="10" width="100" height="150">
-                      {/* <body xmlns="http://www.w3.org/1999/xhtml"> */}
-                      <table>
-                        <thead>
-                          {header.map((item, index) => (
-                            <tr key={index}>
-                              <th>{item}</th>
-                            </tr>
-                          ))}
-                        </thead>
-                      </table>
-                      {/* </body> */}
-                    </foreignObject>
-                  </svg>
-                );
-              };
+              // interface Props {
+              //   data: any[];
+              //   columns: any[];
+              // }
+              // const Table = () => {
+              //   return (
+              //     // <?xml version="1.0" standalone="yes"?>
+              //     <svg xmlns="http://www.w3.org/2000/svg">
+              //       <foreignObject x="10" y="10" width="100" height="150">
+              //         {/* <body xmlns="http://www.w3.org/1999/xhtml"> */}
+              //         <table>
+              //           <thead>
+              //             {header.map((item, index) => (
+              //               <tr key={index}>
+              //                 <th>{item}</th>
+              //               </tr>
+              //             ))}
+              //           </thead>
+              //         </table>
+              //         {/* </body> */}
+              //       </foreignObject>
+              //     </svg>
+              //   );
+              // };
 
               // const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
               //   event,
@@ -5744,22 +5760,39 @@ class App extends React.Component<AppProps, AppState> {
 
               // console.log(element);
 
-              const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-                event,
-                this.state,
-              );
-              console.log(Table);
-              const imageElement = this.createTableElement({ sceneX, sceneY });
-              this.insertImageElement(imageElement, Table);
+              // async function fileDownloadFromUrl(
+              //   fileName: string,
+              //   fileUrl: string,
+              // ) {
+              //   const response = await fetch(fileUrl);
+              //   const blob = await response.blob();
+              //   const newBlob = new Blob([blob]);
+              //   const objUrl = window.URL.createObjectURL(newBlob);
+              //   const link = document.createElement("a");
+              //   link.href = objUrl;
+              //   link.download = fileName;
+              //   link.click();
+              //   // For Firefox it is necessary to delay revoking the ObjectURL.
+              //   setTimeout(() => {
+              //     window.URL.revokeObjectURL(objUrl);
+              //   }, 250);
+              // }
 
-              // console.log(imageElement);
-              this.initializeImageDimensions(imageElement);
-              this.setState({
-                selectedElementIds: { [imageElement.id]: true },
-              });
+              // const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+              //   event,
+              //   this.state,
+              // );
+              // // console.log(Table);
+              // const imageElement = this.createTableElement({ sceneX, sceneY });
+              // this.insertImageElement(imageElement, file);
+
+              // // console.log(imageElement);
+              // this.initializeImageDimensions(imageElement);
+              // this.setState({
+              //   selectedElementIds: { [imageElement.id]: true },
+              // });
             }
           };
-          return;
         }
 
         // if no scene is embedded or we fail for whatever reason, fall back
