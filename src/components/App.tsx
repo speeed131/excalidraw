@@ -102,6 +102,7 @@ import {
   newLinearElement,
   newTextElement,
   newImageElement,
+  newTableElement,
   textWysiwyg,
   transformElements,
   updateTextElement,
@@ -3945,6 +3946,33 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
+  private createTableElement = ({
+    sceneX,
+    sceneY,
+  }: {
+    sceneX: number;
+    sceneY: number;
+  }) => {
+    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+
+    const element = newTableElement({
+      type: "image",
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      strokeSharpness: this.state.currentItemLinearStrokeSharpness,
+      locked: false,
+    });
+
+    return element;
+  };
+
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLCanvasElement>,
     elementType: ExcalidrawLinearElement["type"],
@@ -5591,6 +5619,180 @@ class App extends React.Component<AppProps, AppState> {
               throw error;
             }
           }
+        }
+
+        if (file.type === MIME_TYPES.csv) {
+          const scene = await loadFromBlob(
+            file,
+            this.state,
+            this.scene.getElementsIncludingDeleted(),
+            fileHandle,
+          );
+          this.syncActionResult({
+            ...scene,
+            appState: {
+              ...(scene.appState || this.state),
+              isLoading: false,
+            },
+            replaceFiles: true,
+            commitToHistory: true,
+          });
+
+          const fileReader = new FileReader();
+          console.log(file);
+          // fileReader.readAsDataURL(file);
+          fileReader.readAsText(file, "Shift_JIS");
+          fileReader.onload = () => {
+            // ファイル読み込み
+            // eslint-disable-next-line valid-typeof
+            if (typeof fileReader.result == "string") {
+              const result = fileReader?.result.split("\r\n") ?? null;
+              console.log(result);
+
+              const header = result[0].split(",");
+              console.log(header);
+
+              // interface Props {
+              //   data: any[];
+              //   columns: any[];
+              // }
+              // const Table = () => {
+              //   return (
+              //     // <?xml version="1.0" standalone="yes"?>
+              //     <svg xmlns="http://www.w3.org/2000/svg">
+              //       <foreignObject x="10" y="10" width="100" height="150">
+              //         {/* <body xmlns="http://www.w3.org/1999/xhtml"> */}
+              //         <table>
+              //           <thead>
+              //             {header.map((item, index) => (
+              //               <tr key={index}>
+              //                 <th>{item}</th>
+              //               </tr>
+              //             ))}
+              //           </thead>
+              //         </table>
+              //         {/* </body> */}
+              //       </foreignObject>
+              //     </svg>
+              //   );
+              // };
+
+              // const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+              //   event,
+              //   this.state,
+              // );
+
+              // const insertAtParentCenter = true;
+              // const parentCenterPosition =
+              //   insertAtParentCenter &&
+              //   this.getTextWysiwygSnappedToCenterPosition(
+              //     sceneX,
+              //     sceneY,
+              //     this.state,
+              //     this.canvas,
+              //     window.devicePixelRatio,
+              //   );
+
+              // let existingTextElement: NonDeleted<ExcalidrawTextElement> | null =
+              //   null;
+              // const container: ExcalidrawTextContainer | null = null;
+
+              // const selectedElements = getSelectedElements(
+              //   this.scene.getNonDeletedElements(),
+              //   this.state,
+              // );
+
+              // if (selectedElements.length === 1) {
+              //   if (isTextElement(selectedElements[0])) {
+              //     existingTextElement = selectedElements[0];
+              //   } else if (
+              //     isTextBindableContainer(selectedElements[0], false)
+              //   ) {
+              //     existingTextElement = getBoundTextElement(
+              //       selectedElements[0],
+              //     );
+              //   } else {
+              //     existingTextElement = this.getTextElementAtPosition(
+              //       sceneX,
+              //       sceneY,
+              //     );
+              //   }
+              // } else {
+              //   existingTextElement = this.getTextElementAtPosition(
+              //     sceneX,
+              //     sceneY,
+              //   );
+              // }
+
+              // const element = newTextElement({
+              //   x: parentCenterPosition
+              //     ? parentCenterPosition.elementCenterX
+              //     : sceneX,
+              //   y: parentCenterPosition
+              //     ? parentCenterPosition.elementCenterY
+              //     : sceneY,
+              //   strokeColor: this.state.currentItemStrokeColor,
+              //   backgroundColor: this.state.currentItemBackgroundColor,
+              //   fillStyle: this.state.currentItemFillStyle,
+              //   strokeWidth: this.state.currentItemStrokeWidth,
+              //   strokeStyle: this.state.currentItemStrokeStyle,
+              //   roughness: this.state.currentItemRoughness,
+              //   opacity: this.state.currentItemOpacity,
+              //   strokeSharpness: this.state.currentItemStrokeSharpness,
+              //   text: header.join(" "),
+              //   fontSize: this.state.currentItemFontSize,
+              //   fontFamily: this.state.currentItemFontFamily,
+              //   textAlign: parentCenterPosition
+              //     ? "center"
+              //     : this.state.currentItemTextAlign,
+              //   verticalAlign: parentCenterPosition
+              //     ? VERTICAL_ALIGN.MIDDLE
+              //     : DEFAULT_VERTICAL_ALIGN,
+              //   containerId: undefined,
+              //   groupIds: [],
+              //   locked: false,
+              // });
+              // this.scene.replaceAllElements([
+              //   ...this.scene.getElementsIncludingDeleted(),
+              //   element,
+              // ]);
+              // this.setState({ selectedElementIds: { [element.id]: true } });
+
+              // console.log(element);
+
+              // async function fileDownloadFromUrl(
+              //   fileName: string,
+              //   fileUrl: string,
+              // ) {
+              //   const response = await fetch(fileUrl);
+              //   const blob = await response.blob();
+              //   const newBlob = new Blob([blob]);
+              //   const objUrl = window.URL.createObjectURL(newBlob);
+              //   const link = document.createElement("a");
+              //   link.href = objUrl;
+              //   link.download = fileName;
+              //   link.click();
+              //   // For Firefox it is necessary to delay revoking the ObjectURL.
+              //   setTimeout(() => {
+              //     window.URL.revokeObjectURL(objUrl);
+              //   }, 250);
+              // }
+
+              // const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+              //   event,
+              //   this.state,
+              // );
+              // // console.log(Table);
+              // const imageElement = this.createTableElement({ sceneX, sceneY });
+              // this.insertImageElement(imageElement, file);
+
+              // // console.log(imageElement);
+              // this.initializeImageDimensions(imageElement);
+              // this.setState({
+              //   selectedElementIds: { [imageElement.id]: true },
+              // });
+            }
+          };
         }
 
         // if no scene is embedded or we fail for whatever reason, fall back
