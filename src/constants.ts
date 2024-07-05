@@ -103,6 +103,7 @@ export const MIME_TYPES = {
   bmp: "image/bmp",
   ico: "image/x-icon",
   binary: "application/octet-stream",
+  csv: "text/csv",
 } as const;
 
 export const EXPORT_DATA_TYPES = {
@@ -182,6 +183,7 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   MIME_TYPES.png,
   MIME_TYPES.jpg,
   MIME_TYPES.svg,
+  MIME_TYPES.csv,
   MIME_TYPES.gif,
   MIME_TYPES.webp,
   MIME_TYPES.bmp,

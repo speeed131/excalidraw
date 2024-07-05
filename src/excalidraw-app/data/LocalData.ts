@@ -21,10 +21,12 @@ import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
 
+// indexedDBにfiles-db > files-storeを作成
 const filesStore = createStore("files-db", "files-store");
 
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
+    //全てのキー取得、 引数currentFileIdsと同じキーを全て削除
     const allIds = await keys(filesStore);
     for (const id of allIds) {
       if (!opts.currentFileIds.includes(id as FileId)) {
